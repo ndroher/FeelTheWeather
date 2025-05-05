@@ -21,6 +21,169 @@ type GeocodingData = {
   lon: number;
   country: string;
   state?: string;
+  local_names?: Record<string, string>;
+};
+
+const languages: { label: string; value: string }[] = [
+  { label: "Albanian", value: "sq" },
+  { label: "Afrikaans", value: "af" },
+  { label: "Arabic", value: "ar" },
+  { label: "Azerbaijani", value: "az" },
+  { label: "Basque", value: "eu" },
+  { label: "Belarusian", value: "be" },
+  { label: "Bulgarian", value: "bg" },
+  { label: "Catalan", value: "ca" },
+  { label: "Chinese Simplified", value: "zh_cn" },
+  { label: "Chinese Traditional", value: "zh_tw" },
+  { label: "Croatian", value: "hr" },
+  { label: "Czech", value: "cz" },
+  { label: "Danish", value: "da" },
+  { label: "Dutch", value: "nl" },
+  { label: "English", value: "en" },
+  { label: "Finnish", value: "fi" },
+  { label: "French", value: "fr" },
+  { label: "Galician", value: "gl" },
+  { label: "German", value: "de" },
+  { label: "Greek", value: "el" },
+  { label: "Hebrew", value: "he" },
+  { label: "Hindi", value: "hi" },
+  { label: "Hungarian", value: "hu" },
+  { label: "Icelandic", value: "is" },
+  { label: "Indonesian", value: "id" },
+  { label: "Italian", value: "it" },
+  { label: "Japanese", value: "ja" },
+  { label: "Korean", value: "kr" },
+  { label: "Kurmanji (Kurdish)", value: "ku" },
+  { label: "Latvian", value: "la" },
+  { label: "Lithuanian", value: "lt" },
+  { label: "Macedonian", value: "mk" },
+  { label: "Norwegian", value: "no" },
+  { label: "Persian (Farsi)", value: "fa" },
+  { label: "Polish", value: "pl" },
+  { label: "Portuguese", value: "pt" },
+  { label: "Portuguese (Brazil)", value: "pt_br" },
+  { label: "Romanian", value: "ro" },
+  { label: "Russian", value: "ru" },
+  { label: "Serbian", value: "sr" },
+  { label: "Slovak", value: "sk" },
+  { label: "Slovenian", value: "sl" },
+  { label: "Spanish", value: "es" },
+  { label: "Swedish", value: "sv" },
+  { label: "Thai", value: "th" },
+  { label: "Turkish", value: "tr" },
+  { label: "Ukrainian", value: "uk" },
+  { label: "Vietnamese", value: "vi" },
+  { label: "Zulu", value: "zu" },
+];
+
+const langAliasToISO639: Record<string, string> = {
+  sq: "sq", // Albanian
+  af: "af", // Afrikaans
+  ar: "ar", // Arabic
+  az: "az", // Azerbaijani
+  eu: "eu", // Basque
+  be: "be", // Belarusian
+  bg: "bg", // Bulgarian
+  ca: "ca", // Catalan
+  zh_cn: "zh", // Chinese Simplified
+  zh_tw: "zh", // Chinese Traditional
+  hr: "hr", // Croatian
+  cz: "cs", // Czech
+  da: "da", // Danish
+  nl: "nl", // Dutch
+  en: "en", // English
+  fi: "fi", // Finnish
+  fr: "fr", // French
+  gl: "gl", // Galician
+  de: "de", // German
+  el: "el", // Greek
+  he: "he", // Hebrew
+  hi: "hi", // Hindi
+  hu: "hu", // Hungarian
+  is: "is", // Icelandic
+  id: "id", // Indonesian
+  it: "it", // Italian
+  ja: "ja", // Japanese
+  kr: "ko", // Korean
+  ku: "ku", // Kurdish (Kurmanji)
+  la: "lv", // Latvian
+  lt: "lt", // Lithuanian
+  mk: "mk", // Macedonian
+  no: "no", // Norwegian
+  fa: "fa", // Persian
+  pl: "pl", // Polish
+  pt: "pt", // Portuguese
+  pt_br: "pt", // Brazilian Portuguese mapped to pt
+  ro: "ro", // Romanian
+  ru: "ru", // Russian
+  sr: "sr", // Serbian
+  sk: "sk", // Slovak
+  sl: "sl", // Slovenian
+  sp: "es", // Spanish alias
+  es: "es", // Spanish
+  sv: "sv", // Swedish
+  se: "sv", // Swedish alias
+  th: "th", // Thai
+  tr: "tr", // Turkish
+  ua: "uk", // Ukrainian alias
+  uk: "uk", // Ukrainian
+  vi: "vi", // Vietnamese
+  zu: "zu", // Zulu
+};
+
+const langAliasToBCP47: Record<string, string> = {
+  sq: "sq", // Albanian
+  af: "af", // Afrikaans
+  ar: "ar", // Arabic
+  az: "az", // Azerbaijani
+  eu: "eu", // Basque
+  be: "be", // Belarusian
+  bg: "bg", // Bulgarian
+  ca: "ca", // Catalan
+  zh_cn: "zh-CN", // Chinese Simplified
+  zh_tw: "zh-TW", // Chinese Traditional
+  hr: "hr", // Croatian
+  cz: "cs", // Czech
+  da: "da", // Danish
+  nl: "nl", // Dutch
+  en: "en-US", // English
+  fi: "fi", // Finnish
+  fr: "fr", // French
+  gl: "gl", // Galician
+  de: "de", // German
+  el: "el", // Greek
+  he: "he", // Hebrew
+  hi: "hi", // Hindi
+  hu: "hu", // Hungarian
+  is: "is", // Icelandic
+  id: "id", // Indonesian
+  it: "it", // Italian
+  ja: "ja", // Japanese
+  kr: "ko", // Korean
+  ku: "ku", // Kurdish (Kurmanji)
+  la: "lv", // Latvian
+  lt: "lt", // Lithuanian
+  mk: "mk", // Macedonian
+  no: "no", // Norwegian
+  fa: "fa", // Persian
+  pl: "pl", // Polish
+  pt: "pt-PT", // European Portuguese
+  pt_br: "pt-BR", // Brazilian Portuguese
+  ro: "ro", // Romanian
+  ru: "ru", // Russian
+  sr: "sr", // Serbian
+  sk: "sk", // Slovak
+  sl: "sl", // Slovenian
+  sp: "es-ES", // Spanish (alias)
+  es: "es-ES", // Spanish
+  sv: "sv", // Swedish
+  se: "sv", // Swedish (alias)
+  th: "th", // Thai
+  tr: "tr", // Turkish
+  ua: "uk", // Ukrainian (alias)
+  uk: "uk", // Ukrainian
+  vi: "vi", // Vietnamese
+  zu: "zu", // Zulu
 };
 
 function App() {
@@ -64,13 +227,40 @@ function App() {
     };
   }, []);
 
+  function getTranslatedCityName(
+    location: GeocodingData,
+    openWeatherLangCode: string
+  ): string {
+    const localNames = location.local_names ?? {};
+    const normalizedLang = openWeatherLangCode.toLowerCase();
+    const mappedLang = langAliasToISO639[normalizedLang];
+    return mappedLang && localNames[mappedLang]
+      ? localNames[mappedLang]
+      : location.name;
+  }
+
+  const [lang, setLang] = React.useState("en");
+
+  React.useEffect(() => {
+    if (!selectedLocation) return;
+
+    const translatedName = getTranslatedCityName(selectedLocation, lang);
+    setSelectedQuery(`${translatedName}, ${selectedLocation.country}`);
+  }, [lang, selectedLocation]);
+
+  const [locale, setLocale] = React.useState("en-US");
+
+  React.useEffect(() => {
+    setLocale(langAliasToBCP47[lang]);
+  }, [lang]);
+
   const WEATHER_URL =
     selectedLocation !== null
       ? `https://api.openweathermap.org/data/2.5/weather?lat=${
           selectedLocation.lat
         }&lon=${selectedLocation.lon}&appid=${
           import.meta.env.VITE_OPENWEATHER_API_KEY
-        }&units=metric&lang=en_us`
+        }&units=metric&lang=${lang}`
       : "";
 
   const weather = useFetch<WeatherData>(WEATHER_URL);
@@ -97,7 +287,7 @@ function App() {
       );
 
       setLocalDate(
-        local.toLocaleDateString("en-US", {
+        local.toLocaleDateString(locale, {
           weekday: "long",
           //year: "numeric",
           month: "long",
@@ -115,6 +305,18 @@ function App() {
   return (
     <section className="p-8 max-w-md mx-auto">
       <div className="relative" ref={suggestionBoxRef}>
+        <select
+          className="p-2 border rounded my-2"
+          value={lang}
+          onChange={(e) => setLang(e.target.value)}
+        >
+          {languages.map(({ label, value }) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
+        </select>
+
         <input
           className="p-2 w-full border rounded"
           value={query}
@@ -145,12 +347,14 @@ function App() {
                     key={index}
                     className="p-2 hover:bg-gray-200 rounded cursor-pointer"
                     onClick={() => {
+                      const translatedName = getTranslatedCityName(
+                        location,
+                        lang
+                      );
                       setSelectedLocation(location);
                       setQuery("");
                       setSelectedQuery(
-                        `${location.name}, ${
-                          location.state ? `${location.state},` : ""
-                        } ${location.country}`
+                        `${translatedName}, ${location.country}`
                       );
                       setShowSuggestions(false);
                     }}
@@ -173,7 +377,6 @@ function App() {
         <div className="mt-4">
           <h2 className="text-xl font-bold mb-2">{selectedQuery}</h2>
           <p>{weather.data.main.temp}°C</p>
-          <p>{weather.data.weather[0].main}</p>
           <p>{weather.data.weather[0].description}</p>
           <img
             src={`https://openweathermap.org/img/wn/${weather.data.weather[0].icon}@2x.png`}
