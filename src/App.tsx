@@ -188,7 +188,7 @@ const langAliasToBCP47: Record<string, string> = {
 
 function App() {
   const [query, setQuery] = React.useState("");
-  const [selectedQuery, setSelectedQuery] = React.useState("");
+  const [selectedQuery, setSelectedQuery] = React.useState(["", ""]);
   const [selectedLocation, setSelectedLocation] =
     React.useState<GeocodingData | null>(null);
   const [debouncedQuery, setDebouncedQuery] = React.useState(query);
@@ -253,7 +253,7 @@ function App() {
     if (!selectedLocation) return;
 
     const translatedName = getTranslatedCityName(selectedLocation, lang);
-    setSelectedQuery(`${translatedName}, ${selectedLocation.country}`);
+    setSelectedQuery([translatedName, selectedLocation.country]);
   }, [lang, selectedLocation]);
 
   const [locale, setLocale] = React.useState("en-US");
@@ -336,160 +336,176 @@ function App() {
   }
 
   return (
-    <section className="p-8 max-w-md mx-auto">
-      <div className="relative" ref={suggestionBoxRef}>
-        <div className="flex gap-2">
-          <input
-            className="p-2 w-full border rounded"
-            value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setShowSuggestions(true);
-              setShowConfig(false);
-            }}
-            placeholder="Search"
-          />
-          <div
-            className="p-2 border rounded cursor-pointer hover:bg-gray-300"
-            onClick={() => {
-              setShowConfig((prev) => !prev);
-              setShowSuggestions(false);
-            }}
-          >
-            ⚙️
-          </div>
-        </div>
-        {suggestions.data && showSuggestions && (
-          <ul className="absolute z-10 bg-white border w-full rounded mt-1 shadow">
-            {suggestions.loading && (
-              <li className="p-2 text-gray-600">Loading...</li>
-            )}
-            {suggestions.error && (
-              <li className="p-2 text-red-500">Error: {suggestions.error}</li>
-            )}
-            {suggestions.data && suggestions.data.length > 0
-              ? [
-                  ...new Map(
-                    suggestions.data.map((item) => [
-                      `${item.name}-${item.state ?? ""}-${item.country}`,
-                      item,
-                    ])
-                  ).values(),
-                ].map((location, index) => (
-                  <li
-                    key={index}
-                    className="p-2 hover:bg-gray-200 rounded cursor-pointer"
-                    onClick={() => {
-                      const translatedName = getTranslatedCityName(
-                        location,
-                        lang
-                      );
-                      setSelectedLocation(location);
-                      setQuery("");
-                      setSelectedQuery(
-                        `${translatedName}, ${location.country}`
-                      );
-                      setShowSuggestions(false);
-                    }}
-                  >
-                    {location.name},{" "}
-                    {location.state ? `${location.state},` : ""}{" "}
-                    {location.country}
-                  </li>
-                ))
-              : !suggestions.loading && (
-                  <li className="p-2 text-gray-600">Not Found</li>
-                )}
-          </ul>
-        )}
-
-        {showConfig && (
-          <div
-            ref={configRef}
-            className="flex flex-col gap-6 absolute z-10 bg-white border rounded mt-1 shadow p-4 right-0"
-          >
-            {/* lang */}
-            <select
-              className="p-2 border rounded"
-              value={lang}
-              onChange={(e) => setLang(e.target.value)}
+    <div className="h-full flex items-center justify-center">
+      <section className="p-8 max-w-xl md:max-w-2xl md:min-w-xl">
+        <div className="relative" ref={suggestionBoxRef}>
+          <div className="flex gap-2">
+            <input
+              className="p-2 w-full border rounded"
+              value={query}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setShowSuggestions(true);
+                setShowConfig(false);
+              }}
+              placeholder="Search"
+            />
+            <div
+              className="p-2 border rounded cursor-pointer hover:bg-gray-300"
+              onClick={() => {
+                setShowConfig((prev) => !prev);
+                setShowSuggestions(false);
+              }}
             >
-              {languages.map(({ label, value }) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-
-            {/* units */}
-            <div className="">
-              {unitsOptions.map(({ label, value }, index) => (
-                <label
-                  key={value}
-                  className={`text-nowrap cursor-pointer py-2 px-4 ${
-                    units === value
-                      ? "bg-gray-800 text-gray-300"
-                      : "bg-gray-300 hover:bg-gray-400 text-gray-800"
-                  } ${index === 0 ? "rounded-l" : "rounded-r"}`}
-                >
-                  <input
-                    type="radio"
-                    name="units"
-                    value={value}
-                    checked={units === value}
-                    onChange={() => setUnits(value)}
-                    hidden
-                  />
-                  {label}
-                </label>
-              ))}
+              ⚙️
             </div>
+          </div>
+          {suggestions.data && showSuggestions && (
+            <ul className="absolute z-10 bg-white border w-full rounded mt-1 shadow">
+              {suggestions.loading && (
+                <li className="p-2 text-gray-600">Loading...</li>
+              )}
+              {suggestions.error && (
+                <li className="p-2 text-red-500">Error: {suggestions.error}</li>
+              )}
+              {suggestions.data && suggestions.data.length > 0
+                ? [
+                    ...new Map(
+                      suggestions.data.map((item) => [
+                        `${item.name}-${item.state ?? ""}-${item.country}`,
+                        item,
+                      ])
+                    ).values(),
+                  ].map((location, index) => (
+                    <li
+                      key={index}
+                      className="p-2 hover:bg-gray-200 rounded cursor-pointer"
+                      onClick={() => {
+                        const translatedName = getTranslatedCityName(
+                          location,
+                          lang
+                        );
+                        setSelectedLocation(location);
+                        setQuery("");
+                        setSelectedQuery([translatedName, location.country]);
+                        setShowSuggestions(false);
+                      }}
+                    >
+                      {location.name},{" "}
+                      {location.state ? `${location.state},` : ""}{" "}
+                      {location.country}
+                    </li>
+                  ))
+                : !suggestions.loading && (
+                    <li className="p-2 text-gray-600">Not Found</li>
+                  )}
+            </ul>
+          )}
 
-            {/* hour formart */}
-            <div className="">
-              {hourFormatOptions.map(({ label, value }, index) => (
-                <label
-                  key={String(value)}
-                  className={`text-nowrap cursor-pointer py-2 px-4 ${
-                    is12HourFormat === value
-                      ? "bg-gray-800 text-gray-300"
-                      : "bg-gray-300 hover:bg-gray-400 text-gray-800"
-                  } ${index === 0 ? "rounded-l" : "rounded-r"}`}
-                >
-                  <input
-                    type="radio"
-                    name="is12HourFormat"
-                    value={String(value)}
-                    checked={is12HourFormat === value}
-                    onChange={() => setIs12HourFormat(value)}
-                    hidden
-                  />
-                  {label}
-                </label>
-              ))}
+          {showConfig && (
+            <div
+              ref={configRef}
+              className="flex flex-col gap-6 absolute z-10 bg-white border rounded mt-1 shadow p-4 right-0"
+            >
+              {/* lang */}
+              <select
+                className="p-2 border rounded"
+                value={lang}
+                onChange={(e) => setLang(e.target.value)}
+              >
+                {languages.map(({ label, value }) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+
+              {/* units */}
+              <div className="">
+                {unitsOptions.map(({ label, value }, index) => (
+                  <label
+                    key={value}
+                    className={`text-nowrap cursor-pointer py-2 px-4 ${
+                      units === value
+                        ? "bg-gray-800 text-gray-300"
+                        : "bg-gray-300 hover:bg-gray-400 text-gray-800"
+                    } ${index === 0 ? "rounded-l" : "rounded-r"}`}
+                  >
+                    <input
+                      type="radio"
+                      name="units"
+                      value={value}
+                      checked={units === value}
+                      onChange={() => setUnits(value)}
+                      hidden
+                    />
+                    {label}
+                  </label>
+                ))}
+              </div>
+
+              {/* hour formart */}
+              <div className="">
+                {hourFormatOptions.map(({ label, value }, index) => (
+                  <label
+                    key={String(value)}
+                    className={`text-nowrap cursor-pointer py-2 px-4 ${
+                      is12HourFormat === value
+                        ? "bg-gray-800 text-gray-300"
+                        : "bg-gray-300 hover:bg-gray-400 text-gray-800"
+                    } ${index === 0 ? "rounded-l" : "rounded-r"}`}
+                  >
+                    <input
+                      type="radio"
+                      name="is12HourFormat"
+                      value={String(value)}
+                      checked={is12HourFormat === value}
+                      onChange={() => setIs12HourFormat(value)}
+                      hidden
+                    />
+                    {label}
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {weather.loading && <div className="mt-4">Loading...</div>}
+
+        {weather.data && (
+          <div className="mt-4 bg-gray-200 p-8 rounded-xl flex flex-col gap-6 items-center justify-center md:grid md:grid-cols-2 md:gap-4 md:aspect-[4/3]">
+            <div
+              className={` ${
+                selectedQuery[0].includes(" ") ? "break-normal" : "break-all"
+              } flex gap-2 items-center flex-col text-center md:text-start md:items-start md:self-start md:content-start"`}
+            >
+              <h1 className="text-2xl md:text-3xl">{selectedQuery[0]}</h1>
+              <h3>{selectedQuery[1]}</h3>
+            </div>
+            <div className="flex flex-col text-center md:text-right md:justify-self-end md:self-start">
+              <h1 className="text-4xl md:text-5xl">
+                {weather.data.main.temp} {getUnitSymbol(units)}
+              </h1>
+              <div className="flex items-center justify-center md:justify-end">
+                <img
+                  src={`https://openweathermap.org/img/wn/${weather.data.weather[0].icon}.png`}
+                  alt="Weather Icon"
+                />
+                <h2 className="text-lg md:text-xl">
+                  {weather.data.weather[0].description}
+                </h2>
+              </div>
+            </div>
+            <div className="hidden md:block"></div>
+            <div className="flex flex-col text-center md:text-right md:justify-self-end md:self-end">
+              <h2 className="text-xl md:text-2xl">{localTime}</h2>
+              <h3 className="text-sm md:text-base">{localDate}</h3>
             </div>
           </div>
         )}
-      </div>
-
-      {weather.loading && <div className="mt-4">Loading...</div>}
-
-      {weather.data && (
-        <div className="mt-4">
-          <h2 className="text-xl font-bold mb-2">{selectedQuery}</h2>
-          <p>
-            {weather.data.main.temp} {getUnitSymbol(units)}
-          </p>
-          <p>{weather.data.weather[0].description}</p>
-          <img
-            src={`https://openweathermap.org/img/wn/${weather.data.weather[0].icon}@2x.png`}
-            alt="Weather Icon"
-          />
-          <p>{localTime}</p>
-          <p>{localDate}</p>
-        </div>
-      )}
-    </section>
+      </section>
+    </div>
   );
 }
 
