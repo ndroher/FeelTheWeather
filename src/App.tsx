@@ -205,19 +205,27 @@ function App() {
       ? `https://api.openweathermap.org/geo/1.0/direct?q=${debouncedQuery}&limit=5&appid=${
           import.meta.env.VITE_OPENWEATHER_API_KEY
         }`
-      : "";
+      : null;
 
   const suggestions = useFetch<GeocodingData[]>(GEOCODING_URL);
   const [showSuggestions, setShowSuggestions] = React.useState(false);
   const suggestionBoxRef = React.useRef<HTMLDivElement>(null);
 
+  const [showConfig, setShowConfig] = React.useState(false);
+  const configRef = React.useRef<HTMLDivElement>(null);
+
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+
       if (
         suggestionBoxRef.current &&
-        !suggestionBoxRef.current.contains(event.target as Node)
+        !suggestionBoxRef.current.contains(target) &&
+        configRef.current &&
+        !configRef.current.contains(target)
       ) {
         setShowSuggestions(false);
+        setShowConfig(false);
       }
     };
 
@@ -254,19 +262,22 @@ function App() {
     setLocale(langAliasToBCP47[lang]);
   }, [lang]);
 
+  const [units, setUnits] = React.useState("metric");
+
   const WEATHER_URL =
     selectedLocation !== null
       ? `https://api.openweathermap.org/data/2.5/weather?lat=${
           selectedLocation.lat
         }&lon=${selectedLocation.lon}&appid=${
           import.meta.env.VITE_OPENWEATHER_API_KEY
-        }&units=metric&lang=${lang}`
+        }&units=${units}&lang=${lang}`
       : "";
 
   const weather = useFetch<WeatherData>(WEATHER_URL);
 
   const [localTime, setLocalTime] = React.useState("");
   const [localDate, setLocalDate] = React.useState("");
+  const [is12HourFormat, setIs12HourFormat] = React.useState(false);
 
   React.useEffect(() => {
     if (!weather.data) return;
@@ -283,6 +294,7 @@ function App() {
           hour: "2-digit",
           minute: "2-digit",
           second: "2-digit",
+          hour12: is12HourFormat,
         })
       );
 
@@ -300,32 +312,53 @@ function App() {
     const interval = setInterval(updateLocalTimeAndDate, 1000);
 
     return () => clearInterval(interval);
-  }, [weather.data]);
+  }, [weather.data, is12HourFormat]);
+
+  const unitsOptions = [
+    { label: "Metric (°C)", value: "metric" },
+    { label: "Imperial (°F)", value: "imperial" },
+  ];
+
+  const hourFormatOptions = [
+    { label: "12h", value: true },
+    { label: "24h", value: false },
+  ];
+
+  function getUnitSymbol(units: string): string {
+    switch (units) {
+      case "metric":
+        return "°C";
+      case "imperial":
+        return "°F";
+      default:
+        return "";
+    }
+  }
 
   return (
     <section className="p-8 max-w-md mx-auto">
       <div className="relative" ref={suggestionBoxRef}>
-        <select
-          className="p-2 border rounded my-2"
-          value={lang}
-          onChange={(e) => setLang(e.target.value)}
-        >
-          {languages.map(({ label, value }) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
-
-        <input
-          className="p-2 w-full border rounded"
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setShowSuggestions(true);
-          }}
-          placeholder="Search"
-        />
+        <div className="flex gap-2">
+          <input
+            className="p-2 w-full border rounded"
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setShowSuggestions(true);
+              setShowConfig(false);
+            }}
+            placeholder="Search"
+          />
+          <div
+            className="p-2 border rounded cursor-pointer hover:bg-gray-300"
+            onClick={() => {
+              setShowConfig((prev) => !prev);
+              setShowSuggestions(false);
+            }}
+          >
+            ⚙️
+          </div>
+        </div>
         {suggestions.data && showSuggestions && (
           <ul className="absolute z-10 bg-white border w-full rounded mt-1 shadow">
             {suggestions.loading && (
@@ -369,6 +402,74 @@ function App() {
                 )}
           </ul>
         )}
+
+        {showConfig && (
+          <div
+            ref={configRef}
+            className="flex flex-col gap-6 absolute z-10 bg-white border rounded mt-1 shadow p-4 right-0"
+          >
+            {/* lang */}
+            <select
+              className="p-2 border rounded"
+              value={lang}
+              onChange={(e) => setLang(e.target.value)}
+            >
+              {languages.map(({ label, value }) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+
+            {/* units */}
+            <div className="">
+              {unitsOptions.map(({ label, value }, index) => (
+                <label
+                  key={value}
+                  className={`text-nowrap cursor-pointer py-2 px-4 ${
+                    units === value
+                      ? "bg-gray-800 text-gray-300"
+                      : "bg-gray-300 hover:bg-gray-400 text-gray-800"
+                  } ${index === 0 ? "rounded-l" : "rounded-r"}`}
+                >
+                  <input
+                    type="radio"
+                    name="units"
+                    value={value}
+                    checked={units === value}
+                    onChange={() => setUnits(value)}
+                    hidden
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+
+            {/* hour formart */}
+            <div className="">
+              {hourFormatOptions.map(({ label, value }, index) => (
+                <label
+                  key={String(value)}
+                  className={`text-nowrap cursor-pointer py-2 px-4 ${
+                    is12HourFormat === value
+                      ? "bg-gray-800 text-gray-300"
+                      : "bg-gray-300 hover:bg-gray-400 text-gray-800"
+                  } ${index === 0 ? "rounded-l" : "rounded-r"}`}
+                >
+                  <input
+                    type="radio"
+                    name="is12HourFormat"
+                    value={String(value)}
+                    checked={is12HourFormat === value}
+                    onChange={() => setIs12HourFormat(value)}
+                    hidden
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {weather.loading && <div className="mt-4">Loading...</div>}
@@ -376,7 +477,9 @@ function App() {
       {weather.data && (
         <div className="mt-4">
           <h2 className="text-xl font-bold mb-2">{selectedQuery}</h2>
-          <p>{weather.data.main.temp}°C</p>
+          <p>
+            {weather.data.main.temp} {getUnitSymbol(units)}
+          </p>
           <p>{weather.data.weather[0].description}</p>
           <img
             src={`https://openweathermap.org/img/wn/${weather.data.weather[0].icon}@2x.png`}

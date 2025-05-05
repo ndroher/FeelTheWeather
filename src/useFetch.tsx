@@ -7,7 +7,7 @@ interface FetchState<T> {
 }
 
 function useFetch<T>(
-  url: RequestInfo | URL,
+  url: RequestInfo | URL | null,
   options?: RequestInit
 ): FetchState<T> {
   const [data, setData] = React.useState<T | null>(null);
@@ -35,7 +35,8 @@ function useFetch<T>(
         const data = (await response.json()) as T;
         if (!signal.aborted) setData(data);
       } catch (error) {
-        if (!signal.aborted && error instanceof Error) setError(error.message);
+        if (!signal.aborted && error instanceof Error)
+          setError(error.message.includes("400") ? null : error.message);
       } finally {
         if (!signal.aborted) setLoading(false);
       }
