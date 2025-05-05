@@ -186,9 +186,17 @@ const langAliasToBCP47: Record<string, string> = {
   zu: "zu", // Zulu
 };
 
+function getFlagEmoji(countryCode: string): string | null {
+  if (!countryCode || countryCode.length !== 2) return null;
+  const codePoints = [...countryCode.toUpperCase()].map(
+    (c) => 127397 + c.charCodeAt(0)
+  );
+  return String.fromCodePoint(...codePoints);
+}
+
 function App() {
   const [query, setQuery] = React.useState("");
-  const [selectedQuery, setSelectedQuery] = React.useState(["", ""]);
+  const [selectedQuery, setSelectedQuery] = React.useState(["", "", ""]);
   const [selectedLocation, setSelectedLocation] =
     React.useState<GeocodingData | null>(null);
   const [debouncedQuery, setDebouncedQuery] = React.useState(query);
@@ -253,7 +261,11 @@ function App() {
     if (!selectedLocation) return;
 
     const translatedName = getTranslatedCityName(selectedLocation, lang);
-    setSelectedQuery([translatedName, selectedLocation.country]);
+    setSelectedQuery([
+      translatedName,
+      selectedLocation.state ? selectedLocation.state : "",
+      selectedLocation.country,
+    ]);
   }, [lang, selectedLocation]);
 
   const [locale, setLocale] = React.useState("en-US");
@@ -387,7 +399,11 @@ function App() {
                         );
                         setSelectedLocation(location);
                         setQuery("");
-                        setSelectedQuery([translatedName, location.country]);
+                        setSelectedQuery([
+                          translatedName,
+                          location.state ? location.state : "",
+                          location.country,
+                        ]);
                         setShowSuggestions(false);
                       }}
                     >
@@ -444,7 +460,7 @@ function App() {
                 ))}
               </div>
 
-              {/* hour formart */}
+              {/* hour */}
               <div className="">
                 {hourFormatOptions.map(({ label, value }, index) => (
                   <label
@@ -481,7 +497,14 @@ function App() {
               } flex gap-2 items-center flex-col text-center md:text-start md:items-start md:self-start md:content-start"`}
             >
               <h1 className="text-2xl md:text-3xl">{selectedQuery[0]}</h1>
-              <h3>{selectedQuery[1]}</h3>
+              {selectedQuery[1] && (
+                <h3 className="text-sm md:text-base text-gray-800">
+                  {selectedQuery[1]}
+                </h3>
+              )}
+              <h3 className="text-xl md:text-2xl">
+                {getFlagEmoji(selectedQuery[2]) ?? "🏳️"}
+              </h3>
             </div>
             <div className="flex flex-col text-center md:text-right md:justify-self-end md:self-start">
               <h1 className="text-4xl md:text-5xl">
