@@ -1,5 +1,9 @@
 import React from "react";
 import useFetch from "./useFetch";
+import { initParticlesEngine } from "@tsparticles/react";
+import { loadFull } from "tsparticles";
+import ParticlesBackground from "./particles/ParticlesBackground";
+import CustomSelect from "./components/customSelect";
 
 type WeatherData = {
   weather: {
@@ -186,15 +190,16 @@ const langAliasToBCP47: Record<string, string> = {
   zu: "zu", // Zulu
 };
 
-function getFlagEmoji(countryCode: string): string | null {
-  if (!countryCode || countryCode.length !== 2) return null;
-  const codePoints = [...countryCode.toUpperCase()].map(
-    (c) => 127397 + c.charCodeAt(0)
-  );
-  return String.fromCodePoint(...codePoints);
-}
-
 function App() {
+  const [particlesLoaded, setParticlesLoaded] = React.useState(false);
+
+  React.useEffect(() => {
+    initParticlesEngine(async (engine) => {
+      await loadFull(engine);
+      setParticlesLoaded(true);
+    });
+  }, []);
+
   const [query, setQuery] = React.useState("");
   const [selectedQuery, setSelectedQuery] = React.useState(["", "", ""]);
   const [selectedLocation, setSelectedLocation] =
@@ -221,6 +226,9 @@ function App() {
 
   const [showConfig, setShowConfig] = React.useState(false);
   const configRef = React.useRef<HTMLDivElement>(null);
+  const configButtonRef = React.useRef<HTMLDivElement>(null);
+
+  const [open, setOpen] = React.useState(false);
 
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -228,11 +236,17 @@ function App() {
 
       if (
         suggestionBoxRef.current &&
-        !suggestionBoxRef.current.contains(target) &&
-        configRef.current &&
-        !configRef.current.contains(target)
+        !suggestionBoxRef.current.contains(target)
       ) {
         setShowSuggestions(false);
+      }
+
+      if (
+        configRef.current &&
+        !configRef.current.contains(target) &&
+        configButtonRef.current &&
+        !configButtonRef.current.contains(target)
+      ) {
         setShowConfig(false);
       }
     };
@@ -347,188 +361,238 @@ function App() {
     }
   }
 
+  function getFlagEmoji(countryCode: string): string | null {
+    if (!countryCode || countryCode.length !== 2) return null;
+    const codePoints = [...countryCode.toUpperCase()].map(
+      (c) => 127397 + c.charCodeAt(0)
+    );
+    return String.fromCodePoint(...codePoints);
+  }
+
+  //const [icon, setIcon] = React.useState<string | undefined>(undefined);
+  const [weatherId, setWeatherId] = React.useState<number | undefined>(
+    undefined
+  );
+  const [isNight, setIsNight] = React.useState(false);
+
+  React.useEffect(() => {
+    if (weather.data?.weather?.[0]?.icon) {
+      //setIcon(weather.data.weather[0].icon);
+      setIsNight(weather.data.weather[0].icon.endsWith("n"));
+    }
+    if (weather.data?.weather?.[0]?.id) {
+      setWeatherId(weather.data.weather[0].id);
+    }
+  }, [weather.data]);
+
   return (
-    <div className="h-full flex items-center justify-center">
-      <section className="p-8 max-w-xl md:max-w-2xl md:min-w-xl">
-        <div className="relative" ref={suggestionBoxRef}>
-          <div className="flex gap-2">
-            <input
-              className="p-2 w-full border rounded"
-              value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setShowSuggestions(true);
-                setShowConfig(false);
-              }}
-              placeholder="Search"
-            />
-            <div
-              className="p-2 border rounded cursor-pointer hover:bg-gray-300"
-              onClick={() => {
-                setShowConfig((prev) => !prev);
-                setShowSuggestions(false);
-              }}
-            >
-              ⚙️
-            </div>
-          </div>
-          {suggestions.data && showSuggestions && (
-            <ul className="absolute z-10 bg-white border w-full rounded mt-1 shadow">
-              {suggestions.loading && (
-                <li className="p-2 text-gray-600">Loading...</li>
-              )}
-              {suggestions.error && (
-                <li className="p-2 text-red-500">Error: {suggestions.error}</li>
-              )}
-              {suggestions.data && suggestions.data.length > 0
-                ? [
-                    ...new Map(
-                      suggestions.data.map((item) => [
-                        `${item.name}-${item.state ?? ""}-${item.country}`,
-                        item,
-                      ])
-                    ).values(),
-                  ].map((location, index) => (
-                    <li
-                      key={index}
-                      className="p-2 hover:bg-gray-200 rounded cursor-pointer"
-                      onClick={() => {
-                        const translatedName = getTranslatedCityName(
-                          location,
-                          lang
-                        );
-                        setSelectedLocation(location);
-                        setQuery("");
-                        setSelectedQuery([
-                          translatedName,
-                          location.state ? location.state : "",
-                          location.country,
-                        ]);
-                        setShowSuggestions(false);
-                      }}
-                    >
-                      {location.name},{" "}
-                      {location.state ? `${location.state},` : ""}{" "}
-                      {location.country}
-                    </li>
-                  ))
-                : !suggestions.loading && (
-                    <li className="p-2 text-gray-600">Not Found</li>
-                  )}
-            </ul>
-          )}
+    <>
+      {/* Day gradient */}
+      <div
+        className={`fixed inset-0 -z-20 transition-opacity duration-2000 ease-in-out ${
+          isNight ? "opacity-0" : "opacity-100"
+        } bg-gradient-to-b from-sky-200 to-blue-400`}
+      />
 
-          {showConfig && (
-            <div
-              ref={configRef}
-              className="flex flex-col gap-6 absolute z-10 bg-white border rounded mt-1 shadow p-4 right-0"
-            >
-              {/* lang */}
-              <select
-                className="p-2 border rounded"
-                value={lang}
-                onChange={(e) => setLang(e.target.value)}
+      {/* Night gradient */}
+      <div
+        className={`fixed inset-0 -z-20 transition-opacity duration-2000 ease-in-out ${
+          isNight ? "opacity-100" : "opacity-0"
+        } bg-gradient-to-b from-[#070B34] to-[#483475]`}
+      />
+
+      {particlesLoaded && weatherId && <ParticlesBackground id={weatherId} />}
+
+      <div className="h-full flex items-center justify-center">
+        <section
+          className={`${
+            isNight ? "text-white" : "text-black"
+          } p-8 max-w-xl md:max-w-2xl md:min-w-xl transition-colors duration-2000`}
+        >
+          <div className="relative" ref={suggestionBoxRef}>
+            <div className="flex gap-2">
+              <input
+                className="placeholder-slate-500 px-4 py-2 w-full rounded glass glass-hover-shadow"
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setShowSuggestions(true);
+                  setShowConfig(false);
+                }}
+                placeholder="Search"
+              />
+              <div
+                ref={configButtonRef}
+                className="p-2 rounded cursor-pointer glass glass-hover-shadow"
+                onClick={() => {
+                  setShowConfig((prev) => !prev);
+                  setShowSuggestions(false);
+                }}
               >
-                {languages.map(({ label, value }) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-
-              {/* units */}
-              <div className="">
-                {unitsOptions.map(({ label, value }, index) => (
-                  <label
-                    key={value}
-                    className={`text-nowrap cursor-pointer py-2 px-4 ${
-                      units === value
-                        ? "bg-gray-800 text-gray-300"
-                        : "bg-gray-300 hover:bg-gray-400 text-gray-800"
-                    } ${index === 0 ? "rounded-l" : "rounded-r"}`}
-                  >
-                    <input
-                      type="radio"
-                      name="units"
-                      value={value}
-                      checked={units === value}
-                      onChange={() => setUnits(value)}
-                      hidden
-                    />
-                    {label}
-                  </label>
-                ))}
+                ⚙️
               </div>
+            </div>
+            {suggestions.data && showSuggestions && (
+              <ul className="absolute z-10 glass w-full rounded mt-1 shadow">
+                {suggestions.loading && (
+                  <li className="px-4 py-2 text-slate-500">Loading...</li>
+                )}
+                {suggestions.error && (
+                  <li className="px-4 py-2 text-slate-500">
+                    Error: {suggestions.error}
+                  </li>
+                )}
+                {suggestions.data && suggestions.data.length > 0
+                  ? [
+                      ...new Map(
+                        suggestions.data.map((item) => [
+                          `${item.name}-${item.state ?? ""}-${item.country}`,
+                          item,
+                        ])
+                      ).values(),
+                    ].map((location, index) => (
+                      <li
+                        key={index}
+                        className="px-4 py-2 glass-hover rounded cursor-pointer"
+                        onClick={() => {
+                          const translatedName = getTranslatedCityName(
+                            location,
+                            lang
+                          );
+                          setSelectedLocation(location);
+                          setQuery("");
+                          setSelectedQuery([
+                            translatedName,
+                            location.state ? location.state : "",
+                            location.country,
+                          ]);
+                          setShowSuggestions(false);
+                        }}
+                      >
+                        {location.name},{" "}
+                        {location.state ? `${location.state},` : ""}{" "}
+                        {location.country}
+                      </li>
+                    ))
+                  : !suggestions.loading && (
+                      <li className="px-4 py-2 text-slate-500">Not Found</li>
+                    )}
+              </ul>
+            )}
 
-              {/* hour */}
-              <div className="">
-                {hourFormatOptions.map(({ label, value }, index) => (
-                  <label
-                    key={String(value)}
-                    className={`text-nowrap cursor-pointer py-2 px-4 ${
-                      is12HourFormat === value
-                        ? "bg-gray-800 text-gray-300"
-                        : "bg-gray-300 hover:bg-gray-400 text-gray-800"
-                    } ${index === 0 ? "rounded-l" : "rounded-r"}`}
-                  >
-                    <input
-                      type="radio"
-                      name="is12HourFormat"
-                      value={String(value)}
-                      checked={is12HourFormat === value}
-                      onChange={() => setIs12HourFormat(value)}
-                      hidden
-                    />
-                    {label}
-                  </label>
-                ))}
+            {showConfig && (
+              <div
+                ref={configRef}
+                className="flex flex-col absolute z-10 glass rounded mt-1 shadow p-4 right-0"
+              >
+                {/* lang */}
+                <CustomSelect
+                  options={languages}
+                  value={lang}
+                  onChange={setLang}
+                  setOpen={setOpen}
+                />
+
+                {/* units */}
+                <div
+                  className={`${
+                    open ? "invisible h-0" : "visible h-auto mt-6"
+                  }`}
+                >
+                  {unitsOptions.map(({ label, value }, index) => (
+                    <label
+                      key={value}
+                      className={`text-nowrap cursor-pointer py-2 px-4 ${
+                        units === value
+                          ? "bg-white/40"
+                          : "bg-white/10 hover:bg-white/20"
+                      } ${index === 0 ? "rounded-l" : "rounded-r"}`}
+                    >
+                      <input
+                        type="radio"
+                        name="units"
+                        value={value}
+                        checked={units === value}
+                        onChange={() => setUnits(value)}
+                        hidden
+                      />
+                      {label}
+                    </label>
+                  ))}
+                </div>
+
+                {/* hour */}
+                <div
+                  className={`${
+                    open ? "invisible h-0" : "visible h-auto mt-6"
+                  }`}
+                >
+                  {hourFormatOptions.map(({ label, value }, index) => (
+                    <label
+                      key={String(value)}
+                      className={`text-nowrap cursor-pointer py-2 px-4 ${
+                        is12HourFormat === value
+                          ? "bg-white/40"
+                          : "bg-white/10 hover:bg-white/20"
+                      } ${index === 0 ? "rounded-l" : "rounded-r"}`}
+                    >
+                      <input
+                        type="radio"
+                        name="is12HourFormat"
+                        value={String(value)}
+                        checked={is12HourFormat === value}
+                        onChange={() => setIs12HourFormat(value)}
+                        hidden
+                      />
+                      {label}
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {weather.loading && <div className="mt-4">Loading...</div>}
+
+          {weather.data && (
+            <div className="mt-4 p-8 glass rounded-xl flex flex-col gap-6 items-center justify-center md:grid md:grid-cols-2 md:gap-4 md:aspect-[4/3]">
+              <div
+                className={` ${
+                  selectedQuery[0].includes(" ") ? "break-normal" : "break-all"
+                } flex gap-2 items-center flex-col text-center md:text-start md:items-start md:self-start md:content-start"`}
+              >
+                <h1 className="text-2xl md:text-3xl">{selectedQuery[0]}</h1>
+                {selectedQuery[1] && (
+                  <h3 className="text-sm md:text-base">{selectedQuery[1]}</h3>
+                )}
+                <h3 className="text-xl md:text-2xl">
+                  {getFlagEmoji(selectedQuery[2]) ?? "🏳️"}
+                </h3>
+              </div>
+              <div className="flex flex-col text-center md:text-right md:justify-self-end md:self-start">
+                <h1 className="text-4xl md:text-5xl">
+                  {weather.data.main.temp} {getUnitSymbol(units)}
+                </h1>
+                <div className="flex items-center justify-center md:justify-end">
+                  <img
+                    src={`https://openweathermap.org/img/wn/${weather.data.weather[0].icon}.png`}
+                    alt="Weather Icon"
+                  />
+                  <h2 className="text-lg md:text-xl">
+                    {weather.data.weather[0].description}
+                  </h2>
+                </div>
+              </div>
+              <div className="hidden md:block"></div>
+              <div className="flex flex-col text-center md:text-right md:justify-self-end md:self-end">
+                <h2 className="text-xl md:text-2xl">{localTime}</h2>
+                <h3 className="text-sm md:text-base">{localDate}</h3>
               </div>
             </div>
           )}
-        </div>
-
-        {weather.loading && <div className="mt-4">Loading...</div>}
-
-        {weather.data && (
-          <div className="mt-4 bg-gray-200 p-8 rounded-xl flex flex-col gap-6 items-center justify-center md:grid md:grid-cols-2 md:gap-4 md:aspect-[4/3]">
-            <div
-              className={` ${
-                selectedQuery[0].includes(" ") ? "break-normal" : "break-all"
-              } flex gap-2 items-center flex-col text-center md:text-start md:items-start md:self-start md:content-start"`}
-            >
-              <h1 className="text-2xl md:text-3xl">{selectedQuery[0]}</h1>
-              {selectedQuery[1] && (
-                <h3 className="text-sm md:text-base text-gray-800">
-                  {selectedQuery[1]}
-                </h3>
-              )}
-              <h3 className="text-xl md:text-2xl">
-                {getFlagEmoji(selectedQuery[2]) ?? "🏳️"}
-              </h3>
-            </div>
-            <div className="flex flex-col text-center md:text-right md:justify-self-end md:self-start">
-              <h1 className="text-4xl md:text-5xl">
-                {weather.data.main.temp} {getUnitSymbol(units)}
-              </h1>
-              <div className="flex items-center justify-center md:justify-end">
-                <img
-                  src={`https://openweathermap.org/img/wn/${weather.data.weather[0].icon}.png`}
-                  alt="Weather Icon"
-                />
-                <h2 className="text-lg md:text-xl">
-                  {weather.data.weather[0].description}
-                </h2>
-              </div>
-            </div>
-            <div className="hidden md:block"></div>
-            <div className="flex flex-col text-center md:text-right md:justify-self-end md:self-end">
-              <h2 className="text-xl md:text-2xl">{localTime}</h2>
-              <h3 className="text-sm md:text-base">{localDate}</h3>
-            </div>
-          </div>
-        )}
-      </section>
-    </div>
+        </section>
+      </div>
+    </>
   );
 }
 

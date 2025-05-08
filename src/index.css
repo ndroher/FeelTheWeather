@@ -5,3 +5,52 @@ body,
 #root {
   height: 100%;
 }
+
+@layer components {
+  .glass {
+    @apply bg-white/0 shadow-lg ring-1 ring-black/5 backdrop-blur-2xl focus:outline-0 focus:shadow-xl;
+    transition: box-shadow 300ms ease-in-out, background-color 300ms ease-in-out;
+  }
+
+  .glass-hover:hover {
+    @apply bg-white/10;
+  }
+
+  .glass-hover-shadow:hover {
+    @apply bg-white/10 shadow-xl;
+  }
+}
+
+/* Scrollbar Track */
+::-webkit-scrollbar-track {
+  background-color: rgba(255, 255, 255, 0); /* bg-white/0 */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -4px rgba(0, 0, 0, 0.1); /* shadow-lg */
+  border-radius: 10px;
+  backdrop-filter: blur(32px); /* backdrop-blur-2xl */
+  border: 1px solid rgba(0, 0, 0, 0.05); /* ring-1 ring-black/5 */
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+  background: transparent;
+}
+
+/* Scrollbar Thumb */
+::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.1); /* bg-white/10 */
+  border-radius: 15px;
+  backdrop-filter: blur(32px); /* Same as .glass */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -4px rgba(0, 0, 0, 0.1); /* shadow-lg */
+  border: 1px solid rgba(0, 0, 0, 0.05); /* ring-black/5 */
+  transition: box-shadow 300ms ease-in-out, background-color 300ms ease-in-out;
+}
+
+/* Hover Effects (glass-hover / glass-hover-shadow) */
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.2); /* bg-white/20 */
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 8px 10px -6px rgba(0, 0, 0, 0.1); /* shadow-xl */
+}
