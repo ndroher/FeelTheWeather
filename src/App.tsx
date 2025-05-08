@@ -228,7 +228,7 @@ function App() {
   const configRef = React.useRef<HTMLDivElement>(null);
   const configButtonRef = React.useRef<HTMLDivElement>(null);
 
-  const [open, setOpen] = React.useState(false);
+  const [showLangOptions, setShowLangOptions] = React.useState(false);
 
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -248,6 +248,7 @@ function App() {
         !configButtonRef.current.contains(target)
       ) {
         setShowConfig(false);
+        setShowLangOptions(false);
       }
     };
 
@@ -410,7 +411,7 @@ function App() {
           } p-8 max-w-xl md:max-w-2xl md:min-w-xl transition-colors duration-2000`}
         >
           <div className="relative" ref={suggestionBoxRef}>
-            <div className="flex gap-2">
+            <div className="flex gap-4">
               <input
                 className="placeholder-slate-500 px-4 py-2 w-full rounded glass glass-hover-shadow"
                 value={query}
@@ -418,6 +419,7 @@ function App() {
                   setQuery(e.target.value);
                   setShowSuggestions(true);
                   setShowConfig(false);
+                  setShowLangOptions(false);
                 }}
                 placeholder="Search"
               />
@@ -490,13 +492,15 @@ function App() {
                   options={languages}
                   value={lang}
                   onChange={setLang}
-                  setOpen={setOpen}
+                  setOpen={setShowLangOptions}
                 />
 
                 {/* units */}
                 <div
                   className={`${
-                    open ? "invisible h-0" : "visible h-auto mt-6"
+                    showLangOptions
+                      ? "invisible h-0"
+                      : "visible h-auto flex mt-4"
                   }`}
                 >
                   {unitsOptions.map(({ label, value }, index) => (
@@ -524,7 +528,9 @@ function App() {
                 {/* hour */}
                 <div
                   className={`${
-                    open ? "invisible h-0" : "visible h-auto mt-6"
+                    showLangOptions
+                      ? "invisible h-0"
+                      : "visible h-auto flex mt-4"
                   }`}
                 >
                   {hourFormatOptions.map(({ label, value }, index) => (
