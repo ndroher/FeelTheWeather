@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import React from "react";
 
 type Option = {
   label: string;
@@ -12,16 +12,16 @@ type CustomSelectProps = {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export default function CustomSelect({
+const CustomSelect = ({
   options,
   value,
   onChange,
   setOpen,
-}: CustomSelectProps) {
-  const [open, setLocalOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+}: CustomSelectProps) => {
+  const [open, setLocalOpen] = React.useState(false);
+  const containerRef = React.useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (
         containerRef.current &&
@@ -83,4 +83,6 @@ export default function CustomSelect({
       )}
     </div>
   );
-}
+};
+
+export default CustomSelect;
