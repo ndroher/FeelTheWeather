@@ -10,6 +10,7 @@ import { langAliasToBCP47 } from "./constants/langAliasToBCP47";
 import { getTranslatedCityName } from "./utils/getTranslatedCityName";
 //components
 import Background from "./components/Background";
+import Loading from "./components/Loading";
 import SearchAndConfig from "./components/SearchAndConfig";
 import WeatherCard from "./components/WeatherCard";
 //particles
@@ -171,7 +172,7 @@ function App() {
             setIs12HourFormat={setIs12HourFormat}
           />
 
-          {weather.loading && <div className="mt-4">Loading...</div>}
+          {weather.loading && <Loading />}
 
           {weather.data && (
             <WeatherCard
