@@ -7,14 +7,17 @@ import type { IOptions, RecursivePartial } from "@tsparticles/engine";
 import { snowParticles } from "./snowParticles";
 import { cloudParticles } from "./cloudParticles";
 // import { mistParticles } from "./mistParticles";
-// import { clearSkyParticles } from "./clearSkyParticles";
+import { clearSkyDayParticles } from "./clearSkyDayParticles";
+import { clearSkyNightParticles } from "./clearSkyNightParticles";
 
 interface Props {
   id: number;
+  isNight: boolean;
 }
 
 const ParticlesBackground = React.memo(function ParticlesBackground({
   id,
+  isNight,
 }: Props) {
   const layers: RecursivePartial<IOptions>[] = React.useMemo(() => {
     const layerConfigs: RecursivePartial<IOptions>[] = [];
@@ -37,7 +40,10 @@ const ParticlesBackground = React.memo(function ParticlesBackground({
     if (snowIds.includes(id)) layerConfigs.push(snowParticles(id));
     if (cloudIds.includes(id)) layerConfigs.push(cloudParticles(id));
     // if (mistIds.includes(id)) layerConfigs.push(mistParticles(id));
-    // if (clearSkyIds.includes(id)) layerConfigs.push(clearSkyParticles(id));
+    if (clearSkyIds.includes(id) && !isNight)
+      layerConfigs.push(clearSkyDayParticles);
+    if (clearSkyIds.includes(id) && isNight)
+      layerConfigs.push(clearSkyNightParticles);
 
     return layerConfigs;
   }, [id]);

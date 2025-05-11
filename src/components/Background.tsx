@@ -28,7 +28,9 @@ const Background = ({
       />
 
       {/* Particles */}
-      {particlesLoaded && weatherId && <ParticlesBackground id={weatherId} />}
+      {particlesLoaded && weatherId && (
+        <ParticlesBackground id={weatherId} isNight={isNight} />
+      )}
     </>
   );
 };
