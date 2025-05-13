@@ -5,7 +5,7 @@ export function snowParticles(id: number): RecursivePartial<IOptions> {
   let speed = 1.5;
   let size = { min: 4, max: 10 };
 
-  if ([600, 612, 620].includes(id)) {
+  if ([511, 600, 612, 620].includes(id)) {
     // light snow
     snowIntensity = 150;
     speed = 1.0;

@@ -2,7 +2,7 @@ import React from "react";
 import Particles from "@tsparticles/react";
 import type { IOptions, RecursivePartial } from "@tsparticles/engine";
 // import { thunderstormParticles } from "./thunderstormParticles";
-// import { rainParticles } from "./rainParticles";
+import { rainParticles } from "./rainParticles";
 // import { drizzleParticles } from "./drizzleParticles";
 import { snowParticles } from "./snowParticles";
 import { cloudParticles } from "./cloudParticles";
@@ -39,7 +39,7 @@ const ParticlesBackground = React.memo(function ParticlesBackground({
     const clearSkyIds = [800];
 
     // if (thunderstormIds.includes(id)) layerConfigs.push(thunderstormParticles(id));
-    // if (rainIds.includes(id)) layerConfigs.push(rainParticles(id));
+    if (rainIds.includes(id)) layerConfigs.push(rainParticles(id, isNight));
     // if (drizzleIds.includes(id)) layerConfigs.push(drizzleParticles(id));
     if (snowIds.includes(id)) layerConfigs.push(snowParticles(id));
     if (cloudIds.includes(id)) layerConfigs.push(cloudParticles(id));
@@ -51,7 +51,7 @@ const ParticlesBackground = React.memo(function ParticlesBackground({
       layerConfigs.push(clearSkyNightParticles);
 
     return layerConfigs;
-  }, [id]);
+  }, [id, isNight]);
 
   return (
     <>
