@@ -14,10 +14,18 @@ export function rainParticles(
   let sizeMax = 40;
   let animationSpeedMin = 60;
   let animationSpeedMax = 80;
+  let opacityMin = 0.4;
+  let opacityMax = 0.8;
+  let emitterDirection = 69;
+  let emitterWidth = 150;
+  let emitterX = 30;
+  let spread = 10;
 
   switch (id) {
-    case 500: // light rain
-    case 520: // light intensity shower rain
+    // Light Rain
+    case 500:
+    case 520:
+    case 615: // light rain and snow
       delay = 0.3;
       quantity = 20;
       speedMin = 25;
@@ -27,9 +35,11 @@ export function rainParticles(
       animationSpeedMax = 55;
       break;
 
-    case 501: // moderate rain
-    case 521: // shower rain
+    // Moderate Rain
+    case 501:
+    case 521:
     case 511: // freezing rain
+    case 616: // rain and snow
       delay = 0.2;
       quantity = 32;
       speedMin = 35;
@@ -39,8 +49,9 @@ export function rainParticles(
       animationSpeedMax = 80;
       break;
 
-    case 502: // heavy intensity rain
-    case 522: // heavy intensity shower rain
+    // Heavy Rain
+    case 502:
+    case 522:
       delay = 0.1;
       quantity = 60;
       speedMin = 40;
@@ -50,8 +61,9 @@ export function rainParticles(
       animationSpeedMax = 110;
       break;
 
-    case 503: // very heavy rain
-    case 531: // ragged shower rain
+    // Very Heavy Rain
+    case 503:
+    case 531:
       delay = 0.1;
       quantity = 75;
       speedMin = 45;
@@ -61,7 +73,8 @@ export function rainParticles(
       animationSpeedMax = 135;
       break;
 
-    case 504: // extreme rain
+    // Extreme Rain
+    case 504:
       delay = 0.1;
       quantity = 100;
       speedMin = 60;
@@ -71,6 +84,66 @@ export function rainParticles(
       animationSpeedMax = 160;
       break;
 
+    // Light Drizzle
+    case 300:
+    case 310:
+      delay = 0.4;
+      quantity = 10;
+      speedMin = 8;
+      speedMax = 12;
+      sizeMin = 1;
+      sizeMax = 8;
+      animationSpeedMin = 20;
+      animationSpeedMax = 30;
+      opacityMin = 0.2;
+      opacityMax = 0.4;
+      emitterDirection = 90;
+      emitterWidth = 200;
+      emitterX = 50;
+      spread = 30;
+      break;
+
+    // Drizzle
+    case 301:
+    case 311:
+    case 313:
+    case 321:
+      delay = 0.35;
+      quantity = 15;
+      speedMin = 10;
+      speedMax = 15;
+      sizeMin = 2;
+      sizeMax = 10;
+      animationSpeedMin = 25;
+      animationSpeedMax = 35;
+      opacityMin = 0.3;
+      opacityMax = 0.5;
+      emitterDirection = 90;
+      emitterWidth = 180;
+      emitterX = 45;
+      spread = 25;
+      break;
+
+    // Heavy Drizzle
+    case 302:
+    case 312:
+    case 314:
+      delay = 0.25;
+      quantity = 25;
+      speedMin = 15;
+      speedMax = 20;
+      sizeMin = 2;
+      sizeMax = 12;
+      animationSpeedMin = 30;
+      animationSpeedMax = 45;
+      opacityMin = 0.4;
+      opacityMax = 0.6;
+      emitterDirection = 90;
+      emitterWidth = 170;
+      emitterX = 40;
+      spread = 20;
+      break;
+
     default:
       break;
   }
@@ -78,6 +151,14 @@ export function rainParticles(
   return {
     fullScreen: { enable: true, zIndex: -1 },
     particles: {
+      opacity: {
+        value: { min: opacityMin, max: opacityMax },
+        animation: {
+          enable: true,
+          speed: 0.3,
+          sync: false,
+        },
+      },
       size: {
         value: { min: sizeMin, max: sizeMax },
         animation: {
@@ -88,9 +169,7 @@ export function rainParticles(
           sync: false,
         },
       },
-      number: {
-        value: 0,
-      },
+      number: { value: 0 },
       shape: { type: "line" },
       move: {
         enable: true,
@@ -99,7 +178,7 @@ export function rainParticles(
         straight: false,
         random: false,
         angle: {
-          value: 10,
+          value: spread,
           offset: 1,
         },
         outModes: "destroy",
@@ -134,9 +213,7 @@ export function rainParticles(
               },
             },
             shape: { type: "circle" },
-            size: {
-              value: 1,
-            },
+            size: { value: 1 },
             move: {
               enable: true,
               speed: 2,
@@ -149,9 +226,9 @@ export function rainParticles(
       },
     },
     emitters: {
-      direction: 69,
+      direction: emitterDirection,
       position: {
-        x: 30,
+        x: emitterX,
         y: 0,
       },
       rate: {
@@ -159,7 +236,7 @@ export function rainParticles(
         delay,
       },
       size: {
-        width: 150,
+        width: emitterWidth,
         height: 100,
       },
     },

@@ -3,7 +3,6 @@ import Particles from "@tsparticles/react";
 import type { IOptions, RecursivePartial } from "@tsparticles/engine";
 // import { thunderstormParticles } from "./thunderstormParticles";
 import { rainParticles } from "./rainParticles";
-// import { drizzleParticles } from "./drizzleParticles";
 import { snowParticles } from "./snowParticles";
 import { cloudParticles } from "./cloudParticles";
 import { atmosphereParticles } from "./atmosphereParticles";
@@ -31,7 +30,7 @@ const ParticlesBackground = React.memo(function ParticlesBackground({
       300, 301, 302, 310, 311, 312, 313, 314, 321, 230, 231, 232,
     ];
     const snowIds = [
-      511, 600, 601, 602, 611, 612, 613, 615, 616, 620, 621, 622,
+      600, 601, 602, 611, 612, 613, 615, 616, 620, 621, 622, 511,
     ];
     const cloudIds = [801, 802, 803, 804];
     const atmosphereIds = [701, 711, 721, 731, 741, 751, 761, 762, 771];
@@ -39,8 +38,8 @@ const ParticlesBackground = React.memo(function ParticlesBackground({
     const clearSkyIds = [800];
 
     // if (thunderstormIds.includes(id)) layerConfigs.push(thunderstormParticles(id));
-    if (rainIds.includes(id)) layerConfigs.push(rainParticles(id, isNight));
-    // if (drizzleIds.includes(id)) layerConfigs.push(drizzleParticles(id));
+    if (rainIds.includes(id) || drizzleIds.includes(id))
+      layerConfigs.push(rainParticles(id, isNight));
     if (snowIds.includes(id)) layerConfigs.push(snowParticles(id));
     if (cloudIds.includes(id)) layerConfigs.push(cloudParticles(id));
     if (atmosphereIds.includes(id)) layerConfigs.push(atmosphereParticles(id));
