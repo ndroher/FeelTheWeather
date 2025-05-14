@@ -26,6 +26,7 @@ export function rainParticles(
     case 500:
     case 520:
     case 615: // light rain and snow
+    case 200: // thunderstorm with light rain
       delay = 0.3;
       quantity = 20;
       speedMin = 25;
@@ -40,6 +41,7 @@ export function rainParticles(
     case 521:
     case 511: // freezing rain
     case 616: // rain and snow
+    case 201: // thunderstorm with rain
       delay = 0.2;
       quantity = 32;
       speedMin = 35;
@@ -52,6 +54,7 @@ export function rainParticles(
     // Heavy Rain
     case 502:
     case 522:
+    case 202: // thunderstorm with heavy rain
       delay = 0.1;
       quantity = 60;
       speedMin = 40;
@@ -87,6 +90,7 @@ export function rainParticles(
     // Light Drizzle
     case 300:
     case 310:
+    case 230: // thunderstorm with light drizzle
       delay = 0.4;
       quantity = 10;
       speedMin = 8;
@@ -108,6 +112,7 @@ export function rainParticles(
     case 311:
     case 313:
     case 321:
+    case 231: // thunderstorm with drizzle
       delay = 0.35;
       quantity = 15;
       speedMin = 10;
@@ -128,6 +133,7 @@ export function rainParticles(
     case 302:
     case 312:
     case 314:
+    case 232: // thunderstorm with heavy drizzle
       delay = 0.25;
       quantity = 25;
       speedMin = 15;
