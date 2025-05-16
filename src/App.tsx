@@ -103,45 +103,7 @@ function App() {
     setLocale(langAliasToBCP47[lang]);
   }, [lang]);
 
-  const [localTime, setLocalTime] = React.useState("");
-  const [localDate, setLocalDate] = React.useState("");
-
   const [is12HourFormat, setIs12HourFormat] = React.useState(false);
-
-  React.useEffect(() => {
-    if (!weather.data) return;
-
-    const offset = weather.data.timezone;
-
-    const updateLocalTimeAndDate = () => {
-      const now = new Date();
-      const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-      const local = new Date(utc + offset * 1000);
-
-      setLocalTime(
-        local.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          hour12: is12HourFormat,
-        })
-      );
-
-      setLocalDate(
-        local.toLocaleDateString(locale, {
-          weekday: "long",
-          month: "long",
-          day: "2-digit",
-          //year: "numeric",
-        })
-      );
-    };
-
-    updateLocalTimeAndDate();
-    const interval = setInterval(updateLocalTimeAndDate, 1000);
-
-    return () => clearInterval(interval);
-  }, [weather.data, is12HourFormat]);
 
   // sounds
   React.useEffect(() => {
@@ -191,8 +153,8 @@ function App() {
               selectedQuery={selectedQuery}
               weatherData={weather.data}
               units={units}
-              localTime={localTime}
-              localDate={localDate}
+              locale={locale}
+              is12HourFormat={is12HourFormat}
             />
           )}
         </section>

@@ -5,7 +5,7 @@ import { getTranslatedCityName } from "../utils/getTranslatedCityName";
 import { hourFormatOptions } from "../constants/hourFormatOptions";
 import { unitsOptions } from "../constants/unitsOptions";
 import { setVolume, toggleMute } from "../utils/soundManager";
-import GlassRange from "./glassRange";
+import GlassRange from "./GlassRange";
 
 type SearchAndConfigProps = {
   query: string;
@@ -97,6 +97,7 @@ const SearchAndConfig = ({
             setShowLangOptions(false);
           }}
           placeholder="Search"
+          name="search"
         />
         <div
           ref={configButtonRef}

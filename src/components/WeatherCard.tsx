@@ -1,21 +1,22 @@
 import { getFlagEmoji } from "../utils/getFlagEmoji";
 import { getUnitSymbol } from "../utils/getUnitSymbol";
 import { WeatherData } from "../types/WeatherData";
+import LocalTimeDisplay from "./LocalTimeDisplay";
 
 type WeatherCardProps = {
   weatherData: WeatherData;
   selectedQuery: string[];
-  localTime: string;
-  localDate: string;
   units: string;
+  locale: string;
+  is12HourFormat: boolean;
 };
 
 const WeatherCard = ({
   weatherData,
   selectedQuery,
-  localTime,
-  localDate,
   units,
+  locale,
+  is12HourFormat,
 }: WeatherCardProps) => {
   if (!weatherData) return null;
 
@@ -49,10 +50,11 @@ const WeatherCard = ({
         </div>
       </div>
       <div className="hidden md:block"></div>
-      <div className="flex flex-col text-center md:text-right md:justify-self-end md:self-end">
-        <h2 className="text-xl md:text-2xl">{localTime}</h2>
-        <h3 className="text-sm md:text-base">{localDate}</h3>
-      </div>
+      <LocalTimeDisplay
+        timezoneOffset={weatherData.timezone}
+        locale={locale}
+        is12HourFormat={is12HourFormat}
+      />
     </div>
   );
 };
