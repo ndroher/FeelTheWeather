@@ -56,9 +56,9 @@ const weatherSoundMap: WeatherSound[] = [
 ];
 
 let activeSounds: Howl[] = [];
-let isMuted = false;
-let previousVolume = 0.6;
-let currentVolume = 0.6;
+let isMuted = localStorage.getItem("isMuted") === "true";
+let previousVolume = parseFloat(localStorage.getItem("volume") || "0.6");
+let currentVolume = isMuted ? 0 : previousVolume;
 
 export function playWeatherSounds(id: number, isNight: boolean) {
   stopAllSounds();
@@ -72,7 +72,6 @@ export function playWeatherSounds(id: number, isNight: boolean) {
   );
 
   const fallbackMatch = weatherSoundMap.find((entry) => entry.ids.includes(id));
-
   const match = preferredMatch || fallbackMatch;
   if (!match) return;
 
@@ -80,7 +79,7 @@ export function playWeatherSounds(id: number, isNight: boolean) {
     const sound = new Howl({
       src: [`/sounds/${soundFile}`],
       loop: true,
-      volume: 0.6,
+      volume: currentVolume,
     });
     sound.play();
     return sound;
@@ -89,6 +88,7 @@ export function playWeatherSounds(id: number, isNight: boolean) {
 
 export function setVolume(volume: number) {
   currentVolume = volume;
+  previousVolume = volume;
   if (!isMuted) {
     activeSounds.forEach((sound) => sound.volume(currentVolume));
   }
@@ -96,9 +96,9 @@ export function setVolume(volume: number) {
 
 export function toggleMute() {
   isMuted = !isMuted;
+  localStorage.setItem("isMuted", String(isMuted));
 
   if (isMuted) {
-    previousVolume = currentVolume;
     activeSounds.forEach((sound) => sound.volume(0));
   } else {
     activeSounds.forEach((sound) => sound.volume(previousVolume));

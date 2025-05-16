@@ -52,8 +52,22 @@ function App() {
   // GET weather
   const [selectedLocation, setSelectedLocation] =
     React.useState<GeocodingData | null>(null);
-  const [units, setUnits] = React.useState("metric");
-  const [lang, setLang] = React.useState("en");
+
+  const [lang, setLang] = React.useState(() => {
+    return localStorage.getItem("lang") || "en";
+  });
+
+  React.useEffect(() => {
+    localStorage.setItem("lang", lang);
+  }, [lang]);
+
+  const [units, setUnits] = React.useState(() => {
+    return localStorage.getItem("units") || "metric";
+  });
+
+  React.useEffect(() => {
+    localStorage.setItem("units", units);
+  }, [units]);
 
   const WEATHER_URL =
     selectedLocation !== null
@@ -103,7 +117,13 @@ function App() {
     setLocale(langAliasToBCP47[lang]);
   }, [lang]);
 
-  const [is12HourFormat, setIs12HourFormat] = React.useState(false);
+  const [is12HourFormat, setIs12HourFormat] = React.useState(
+    () => localStorage.getItem("is12HourFormat") === "true"
+  );
+
+  React.useEffect(() => {
+    localStorage.setItem("is12HourFormat", is12HourFormat.toString());
+  }, [is12HourFormat]);
 
   // sounds
   React.useEffect(() => {

@@ -70,18 +70,27 @@ const SearchAndConfig = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const [volume, setLocalVolume] = React.useState(0.6);
-  const [muted, setMuted] = React.useState(false);
+  const [volume, setLocalVolume] = React.useState(() => {
+    const stored = localStorage.getItem("volume");
+    return stored ? parseFloat(stored) : 0.6;
+  });
+
+  const [muted, setMuted] = React.useState(() => {
+    return localStorage.getItem("isMuted") === "true";
+  });
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseFloat(e.target.value);
     setLocalVolume(newVolume);
+    localStorage.setItem("volume", String(newVolume));
     setVolume(newVolume);
   };
 
   const handleToggleMute = () => {
+    const newMuted = !muted;
+    setMuted(newMuted);
+    localStorage.setItem("isMuted", String(newMuted));
     toggleMute();
-    setMuted(!muted);
   };
 
   return (
