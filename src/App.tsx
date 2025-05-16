@@ -8,6 +8,7 @@ import type { GeocodingData } from "./types/GeocodingData";
 import { langAliasToBCP47 } from "./constants/langAliasToBCP47";
 //utils
 import { getTranslatedCityName } from "./utils/getTranslatedCityName";
+import { playWeatherSounds, stopAllSounds } from "./utils/soundManager";
 //components
 import Background from "./components/Background";
 import Loading from "./components/Loading";
@@ -141,6 +142,17 @@ function App() {
 
     return () => clearInterval(interval);
   }, [weather.data, is12HourFormat]);
+
+  // sounds
+  React.useEffect(() => {
+    if (weatherId) {
+      playWeatherSounds(weatherId, isNight);
+    }
+
+    return () => {
+      stopAllSounds();
+    };
+  }, [weatherId, isNight]);
 
   return (
     <>

@@ -54,3 +54,40 @@ body,
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 8px 10px -6px rgba(0, 0, 0, 0.1); /* shadow-xl */
 }
+
+/* Input range */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 16px;
+  width: 16px;
+  border-radius: 100%;
+  background-color: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10rem);
+  transition: background-color 0.2s ease;
+  border: none;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+input[type="range"]::-moz-range-thumb {
+  height: 16px;
+  width: 16px;
+  border-radius: 100%;
+  background-color: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10rem);
+  transition: background-color 0.2s ease;
+  border: none;
+}
+
+input[type="range"]::-moz-range-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+input[type="range"]::-moz-range-track {
+  background: none;
+  border: none;
+  border-radius: 100%;
+}

@@ -4,6 +4,8 @@ import { languages } from "../constants/languages";
 import { getTranslatedCityName } from "../utils/getTranslatedCityName";
 import { hourFormatOptions } from "../constants/hourFormatOptions";
 import { unitsOptions } from "../constants/unitsOptions";
+import { setVolume, toggleMute } from "../utils/soundManager";
+import GlassRange from "./glassRange";
 
 type SearchAndConfigProps = {
   query: string;
@@ -68,9 +70,23 @@ const SearchAndConfig = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const [volume, setLocalVolume] = React.useState(0.6);
+  const [muted, setMuted] = React.useState(false);
+
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = parseFloat(e.target.value);
+    setLocalVolume(newVolume);
+    setVolume(newVolume);
+  };
+
+  const handleToggleMute = () => {
+    toggleMute();
+    setMuted(!muted);
+  };
+
   return (
     <div className="relative" ref={suggestionBoxRef}>
-      <div className="flex gap-4">
+      <div className="flex gap-4 items-center">
         <input
           className="placeholder-slate-500 px-4 py-2 w-full rounded glass glass-hover-shadow"
           value={query}
@@ -84,7 +100,7 @@ const SearchAndConfig = ({
         />
         <div
           ref={configButtonRef}
-          className="p-2 rounded cursor-pointer glass glass-hover-shadow"
+          className="rounded cursor-pointer glass glass-hover-shadow py-2 px-3"
           onClick={() => {
             setShowConfig((prev) => !prev);
             setShowSuggestions(false);
@@ -207,6 +223,21 @@ const SearchAndConfig = ({
                 {label}
               </label>
             ))}
+          </div>
+
+          {/* volume */}
+          <div
+            className={`${
+              showLangOptions ? "invisible h-0" : "visible h-auto flex mt-4"
+            } flex items-center gap-2`}
+          >
+            <button
+              onClick={handleToggleMute}
+              className="p-2 rounded-full cursor-pointer"
+            >
+              {muted ? "🔇" : "🔊"}
+            </button>
+            <GlassRange value={volume} onChange={handleVolumeChange} />
           </div>
         </div>
       )}
