@@ -116,6 +116,13 @@ function App() {
     };
   }, [weatherId, isNight]);
 
+  // title
+  React.useEffect(() => {
+    document.title = weather.data
+      ? `${selectedLocation?.name} | FeelTheWeather`
+      : "FeelTheWeather";
+  }, [weather.data]);
+
   return (
     <>
       <Background
