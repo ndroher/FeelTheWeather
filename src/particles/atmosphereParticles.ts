@@ -83,5 +83,31 @@ export function atmosphereParticles(id: number): RecursivePartial<IOptions> {
         height: 20,
       },
     },
+    interactivity: {
+      events: {
+        onHover: {
+          enable: true,
+          mode: "bubble",
+        },
+        onClick: {
+          enable: true,
+          mode: "repulse",
+        },
+      },
+      modes: {
+        bubble: {
+          distance: 150,
+          size: 80,
+          duration: 5,
+          speed: 1,
+        },
+        repulse: {
+          distance: 200,
+          duration: 3,
+          speed: 1,
+          factor: 200,
+        },
+      },
+    },
   };
 }

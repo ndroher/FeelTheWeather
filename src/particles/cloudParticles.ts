@@ -29,7 +29,7 @@ export function cloudParticles(id: number): RecursivePartial<IOptions> {
     fullScreen: { enable: true, zIndex: -1 },
     particles: {
       opacity: {
-        value: { min: 0.3, max: 0.7 },
+        value: { min: 0.4, max: 0.8 },
         animation: {
           enable: true,
           speed: 0.2,
@@ -37,7 +37,7 @@ export function cloudParticles(id: number): RecursivePartial<IOptions> {
         },
       },
       size: {
-        value: { min: 40, max: 120 },
+        value: { min: 60, max: 120 },
         animation: {
           enable: true,
           speed: 5,
@@ -53,12 +53,41 @@ export function cloudParticles(id: number): RecursivePartial<IOptions> {
           },
         },
       },
-
       move: {
         enable: true,
         direction: "right",
         speed: { min: 0.2, max: 0.8 },
         outModes: { default: "out" },
+      },
+      zIndex: {
+        value: { min: 0, max: 15 },
+        opacityRate: 2,
+      },
+    },
+    interactivity: {
+      events: {
+        onHover: {
+          enable: true,
+          mode: "bubble",
+        },
+        onClick: {
+          enable: true,
+          mode: "repulse",
+        },
+      },
+      modes: {
+        bubble: {
+          distance: 150,
+          size: 80,
+          duration: 5,
+          speed: 1,
+        },
+        repulse: {
+          distance: 200,
+          duration: 3,
+          speed: 1,
+          factor: 200,
+        },
       },
     },
   };

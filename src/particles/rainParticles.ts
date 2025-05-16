@@ -246,5 +246,19 @@ export function rainParticles(
         height: 100,
       },
     },
+    interactivity: {
+      events: {
+        onHover: {
+          enable: true,
+          mode: "slow",
+        },
+      },
+      modes: {
+        slow: {
+          factor: 2,
+          radius: 150,
+        },
+      },
+    },
   };
 }

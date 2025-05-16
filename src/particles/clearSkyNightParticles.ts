@@ -41,4 +41,28 @@ export const clearSkyNightParticles: ISourceOptions = {
       straight: true,
     },
   },
+  interactivity: {
+    events: {
+      onHover: {
+        enable: true,
+        mode: "bubble",
+      },
+      onClick: {
+        enable: true,
+        mode: "push",
+      },
+    },
+    modes: {
+      bubble: {
+        distance: 100,
+        size: 6,
+        opacity: 0.9,
+        duration: 4,
+        speed: 0.5,
+      },
+      push: {
+        quantity: 1,
+      },
+    },
+  },
 };

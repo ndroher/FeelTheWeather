@@ -26,7 +26,7 @@ export const clearSkyDayParticles: ISourceOptions = {
       value: 40,
     },
     color: {
-      value: "#ffffff",
+      value: ["#ffffff", "#fffee9", "#fffbc8"],
     },
     shape: {
       type: "circle",
@@ -39,6 +39,30 @@ export const clearSkyDayParticles: ISourceOptions = {
         default: "out",
       },
       straight: false,
+    },
+  },
+  interactivity: {
+    events: {
+      onHover: {
+        enable: true,
+        mode: "bubble",
+      },
+      onClick: {
+        enable: true,
+        mode: "push",
+      },
+    },
+    modes: {
+      bubble: {
+        distance: 150,
+        size: 6,
+        opacity: 0.5,
+        duration: 4,
+        speed: 0.5,
+      },
+      push: {
+        quantity: 3,
+      },
     },
   },
 };

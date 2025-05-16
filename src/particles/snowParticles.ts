@@ -70,5 +70,26 @@ export function snowParticles(id: number): RecursivePartial<IOptions> {
         },
       },
     },
+    interactivity: {
+      events: {
+        onHover: {
+          enable: true,
+          mode: "slow",
+        },
+        onClick: {
+          enable: true,
+          mode: "push",
+        },
+      },
+      modes: {
+        slow: {
+          factor: 5,
+          radius: 150,
+        },
+        push: {
+          quantity: 3,
+        },
+      },
+    },
   };
 }
