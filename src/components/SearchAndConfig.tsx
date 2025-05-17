@@ -25,6 +25,18 @@ type SearchAndConfigProps = {
   setIs12HourFormat: (val: boolean) => void;
 };
 
+const placeholders = [
+  "Type a location to get weather...",
+  "Search for your desired location...",
+  "Where do you want the weather for?",
+  "Where are you curious about the weather?",
+  "Type a place to check the forecast...",
+  "Type a place, anywhere!",
+  "Where you wanna check the weather?",
+  "Search for a place, quick!",
+  "Got a city in mind? Type it!",
+];
+
 const SearchAndConfig = ({
   query,
   setQuery,
@@ -70,6 +82,13 @@ const SearchAndConfig = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const [placeholder, setPlaceholder] = React.useState("");
+
+  React.useEffect(() => {
+    const randomIndex = Math.floor(Math.random() * placeholders.length);
+    setPlaceholder(placeholders[randomIndex]);
+  }, []);
+
   const [volume, setLocalVolume] = React.useState(() => {
     const stored = localStorage.getItem("volume");
     return stored ? parseFloat(stored) : 0.6;
@@ -106,7 +125,7 @@ const SearchAndConfig = ({
             setShowConfig(false);
             setShowLangOptions(false);
           }}
-          placeholder="Search"
+          placeholder={placeholder}
           name="search-autoCompleteOff"
           autoComplete="off"
         />
