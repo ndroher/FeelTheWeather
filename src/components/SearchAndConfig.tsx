@@ -97,6 +97,7 @@ const SearchAndConfig = ({
     <div className="relative" ref={suggestionBoxRef}>
       <div className="flex gap-4 items-center">
         <input
+          type="text"
           className="placeholder-slate-500 px-4 py-2 w-full rounded glass glass-hover-shadow"
           value={query}
           onChange={(e) => {
@@ -106,7 +107,8 @@ const SearchAndConfig = ({
             setShowLangOptions(false);
           }}
           placeholder="Search"
-          name="search"
+          name="search-autoCompleteOff"
+          autoComplete="off"
         />
         <div
           ref={configButtonRef}
