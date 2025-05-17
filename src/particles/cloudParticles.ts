@@ -49,7 +49,7 @@ export function cloudParticles(id: number): RecursivePartial<IOptions> {
         type: "image",
         options: {
           image: {
-            src: "src/assets/images/cloud.png",
+            src: "/images/cloud.png",
           },
         },
       },

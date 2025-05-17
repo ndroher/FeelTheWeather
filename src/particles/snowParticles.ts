@@ -41,7 +41,7 @@ export function snowParticles(id: number): RecursivePartial<IOptions> {
         type: "image",
         options: {
           image: {
-            src: "src/assets/images/snowflake.png",
+            src: "/images/snowflake.png",
           },
         },
       },

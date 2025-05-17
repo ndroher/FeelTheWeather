@@ -9,17 +9,17 @@ export function atmosphereParticles(id: number): RecursivePartial<IOptions> {
 
   if (cleanSmokeIds.includes(id)) {
     imageOptions.push({
-      src: "src/assets/images/smoke-clean.png",
+      src: "/images/smoke-clean.png",
     });
   }
   if (sandSmokeIds.includes(id)) {
     imageOptions.push({
-      src: "src/assets/images/smoke-sand.png",
+      src: "/images/smoke-sand.png",
     });
   }
   if (blackSmokeIds.includes(id)) {
     imageOptions.push({
-      src: "src/assets/images/smoke-black.png",
+      src: "/images/smoke-black.png",
     });
   }
 
