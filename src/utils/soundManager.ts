@@ -79,7 +79,7 @@ export function playWeatherSounds(id: number, isNight: boolean) {
     const sound = new Howl({
       src: [`/sounds/${soundFile}`],
       loop: true,
-      volume: currentVolume,
+      volume: isMuted ? 0 : currentVolume,
     });
     sound.play();
     return sound;
@@ -89,6 +89,7 @@ export function playWeatherSounds(id: number, isNight: boolean) {
 export function setVolume(volume: number) {
   currentVolume = volume;
   previousVolume = volume;
+  localStorage.setItem("volume", volume.toString());
   if (!isMuted) {
     activeSounds.forEach((sound) => sound.volume(currentVolume));
   }
@@ -97,7 +98,6 @@ export function setVolume(volume: number) {
 export function toggleMute() {
   isMuted = !isMuted;
   localStorage.setItem("isMuted", String(isMuted));
-
   if (isMuted) {
     activeSounds.forEach((sound) => sound.volume(0));
   } else {
